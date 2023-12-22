@@ -1,0 +1,4 @@
+(library
+ (public_name tsr-shape) (name tsr_shape)
+ (preprocess (pps ppx_expect))
+ )

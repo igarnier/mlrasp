@@ -2,7 +2,7 @@ open Rasp
 
 
 let () = Lang.(
-    (indices +% (int 1))
+    (indices (input ()) +% (int 1))
     |> eval (String.to_seq "hello")
     |> Seq.iter (fun i ->
         Printf.printf "%d, %!" i)
@@ -11,7 +11,7 @@ let () = Lang.(
 let () = print_newline ()
 
 let () = Lang.(
-    tokens_if (indices mod 2 =% (int 0)) (char '-')
+    if_ ((indices (input ())) mod (int 2) =% (int 0)) (input ()) (char '-')
     |> eval (String.to_seq "hello")
     |> String.of_seq
     |> Printf.printf "%s%!"
@@ -20,9 +20,10 @@ let () = Lang.(
 let () = print_newline ()
 
 let () = Lang.(
+    let expr = indices (input ()) in
     aggregate
-      (select indices indices (<))
-      (to_float (indices +% (int 1)))
+      (select expr expr Lt)
+      (to_float (expr +% (int 1)))
     |> eval (String.to_seq "hey")
     |> Seq.iter (fun f ->
         Printf.printf "%f, %!" f)
@@ -34,14 +35,15 @@ let () = print_newline ()
 
 let () =
   let open Lang in
+  let indices = indices (input ()) in
+  let length = length (input ()) in
   aggregate
-    (select indices (length -% indices -% int 1) Int.equal)
+    (select indices (length -% indices -% int 1) Equal)
     (to_float indices)
   |> to_int
-  |> load
   |> eval (String.to_seq "dummy")
-  |> String.of_seq
-  |> Printf.printf "%s%!"
+  |> fun seq ->
+  Format.printf "%a@." (Format.pp_print_seq Format.pp_print_int) seq
 
 let () = print_newline ()
 
@@ -49,6 +51,7 @@ let () = print_newline ()
 
 let () =
   let open Lang in
+  let indices = indices (input ()) in
   (* Why it works:
      - indicator (indices = 0) == 1 0 0 0 ... 0 of length [L]
      - select_all is true everywhere
@@ -64,7 +67,7 @@ let () = print_newline ()
 
 (* Histogram *)
 
-let () =
+(*let () =
   let open Lang in
   aggregate
     (select id id Char.equal)
@@ -72,3 +75,4 @@ let () =
   |> eval (String.to_seq "dummy")
   |> Seq.iter (fun f ->
       Printf.printf "%f, %!" f)
+*)
